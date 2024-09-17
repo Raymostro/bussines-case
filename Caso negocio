@@ -1,0 +1,102 @@
+ Definir la interfaz de usuario
+ui <- fluidPage(
+    titlePanel("Bienvenidos al Caso de Negocio Talent Evaluation Middle Manager"),
+
+    sidebarLayout(
+        sidebarPanel(
+            selectInput("kpi", "Selecciona KPI:", choices = c("Facturación", "Rentabilidad", "Todo")),
+            selectInput("datos_equipo", "Selecciona Área:", choices = c("Ventas", "Postventas", "Ambas")),
+            selectInput("encuesta_cliente", "Selecciona Área de evaluación:", choices = c("Exposición", "Calidad del Producto", "Servicio técnico", "Extensión de Garantía", "Customer Experience"))
+        ),
+
+        mainPanel(
+            tabsetPanel(
+                tabPanel("Resultados Generales", tableOutput("table1")),
+                tabPanel("Área de Ventas", tableOutput("table2")),
+                tabPanel("Área de Postventa", tableOutput("table3")),
+                tabPanel("Datos del equipo", tableOutput("table_equipo")),
+                tabPanel("Encuesta cliente", tableOutput("table_encuesta"))
+            )
+        )
+    )
+)
+
+# Definir la lógica del servidor
+server <- function(input, output) {
+    output$table1 <- renderTable({
+        data.frame(
+            KPI = c("Facturación Ventas", "Facturación Postventa", "Rentabilidad Ventas", "Rentabilidad Postventa"),
+            Objetivo = c("3.340.000 €", "3.540.500 €", "2.000.000 €", "2.450.000 €"),
+            Sucursal = c("2.555.000 €", "2.850.000 €", "1.625.000 €", "1.650.000 €"),
+            Con_SO = c("3.025.000 €", "3.650.000 €", "1.975.000 €", "2.630.000 €"),
+            Sin_SO = c("3.505.000 €", "2.920.000 €", "2.175.000 €", "1.628.000 €")
+        )
+    })
+
+    output$table2 <- renderTable({
+        data.frame(
+            "Área de Ventas" = c("Extensión de Garantías", "Ventas máquinas (unidades)", "Ventas accesorios"),
+            Objetivo = c("80%", "1500", "697"),
+            Sucursal = c("60%", "1137", "667"),
+            Con_SO = c("80%", "1383", "619"),
+            Sin_SO = c("50%", "1522", "1095")
+        )
+    })
+
+    output$table3 <- renderTable({
+        data.frame(
+            "Área de Posventa" = c("Mano de obra", "Recambios"),
+            Objetivo = c("2.043.000 €", "1.416.200 €"),
+            Sucursal = c("1.710.000 €", "1.140.000 €"),
+            Con_SO = c("2.190.000 €", "1.460.000 €"),
+            Sin_SO = c("1.168.000 €", "1.752.000 €")
+        )
+    })
+
+    output$table_equipo <- renderTable({
+        if (input$datos_equipo == "Ventas") {
+            data.frame(
+                Empleado = c("Pedro", "Clara", "Juan"),
+                "Objetivo Venta (u)" = c(267, 267, 267),
+                "Venta (unidades)" = c(357, 400, 380),
+                "Satisfacción Cliente" = c(4.5, 3.8, 3.7)
+            )
+        } else if (input$datos_equipo == "Postventas") {
+            data.frame(
+                Empleado = c("Pedro", "Clara", "Juan"),
+                "Objetivo Venta (u)" = c(267, 267, 267),
+                "Venta (unidades)" = c(357, 400, 380),
+                "Satisfacción Cliente" = c(4.5, 3.8, 3.7),
+                "Datos adicionales" = c("Avería repetitiva 4%", "Reparación 3.5 días", "Avería repetitiva 4%")
+            )
+        } else {
+            data.frame(
+                Empleado = c("Pedro", "Clara", "Juan"),
+                "Objetivo Venta (u)" = c(267, 267, 267),
+                "Venta (unidades)" = c(357, 400, 380),
+                "Satisfacción Cliente" = c(4.5, 3.8, 3.7),
+                "Datos adicionales" = c("Avería repetitiva 4%", "Reparación 3.5 días", "Avería repetitiva 4%")
+            )
+        }
+    })
+
+    output$table_encuesta <- renderTable({
+        data.frame(
+            "Áreas de evaluación" = c("Exposición", "Calidad del Producto", "Servicio técnico", "Extensión de Garantía", "Customer Experience"),
+            "Puntuación del 1-5" = c(3.9, 4.7, 3.9, 4.0, 3.7),
+            "Comentarios de los Clientes" = c(
+                "para mi probar el producto es fundamental a la hora de decidir una compra",
+                "",
+                "hacen un buen trabajo, pero deberían demorar menos en la reparación",
+                "para nuestro negocio contratar este servicio fue estratégico",
+                "les falta más información de los productos nuevos"
+            )
+        )
+    })
+}
+
+# Ejecutar la aplicación Shiny
+shinyApp(ui = ui, server = server)
+
+
+
